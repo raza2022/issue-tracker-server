@@ -29,7 +29,7 @@ router.route('/issues').get((req, res) => {
     });
 });
 
-router.route('/issues/add').post((req, res) => {
+router.route('/issues').post((req, res) => {
     let issue = new Issue(req.body);
     issue.save()
         .then(issue => {
@@ -52,7 +52,7 @@ router.route('/issues/:id').get((req, res) => {
 router.route('/issues/update/:id').post((req, res) => {
     Issue.findById(req.params.id, (err, issue) => {
         if (!issue)
-            return next(new Error('Could not load Document'));
+            return new Error('Could not load Document');
         else {
             issue.title = req.body.title;
             issue.responsible = req.body.responsible;
@@ -68,7 +68,8 @@ router.route('/issues/update/:id').post((req, res) => {
     });
 });
 
-router.route('/issues/delete/:id').get((req, res) => {
+router.route('/issues/:id').delete((req, res) => {
+    console.log(req.params.id)
     Issue.findByIdAndRemove({_id: req.params.id}, (err, issue) => {
         if (err)
             res.json(err);
