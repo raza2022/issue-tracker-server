@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
+import path from 'path'
 
 import Issue from './models/Issue';
 
@@ -19,6 +20,10 @@ const connection = mongoose.connection;
 connection.once('open', () => {
     console.log('MongoDB database connection established successfully!');
 });
+
+// app.engine('html', require('ejs').renderFile);
+// app.set('view engine', 'html');
+app.use(express.static(path.join(__dirname, '/dist/issue-tracker')));
 
 router.route('/issues').get((req, res) => {
     Issue.find((err, issues) => {
@@ -80,4 +85,8 @@ router.route('/issues/:id').delete((req, res) => {
 
 app.use('/', router);
 app.listen(4000, () => console.log(`Express server running on port 4000`));
-app.get('/', (req, res) => res.send('Hello World!'));
+router.get('/', (req, res) => {
+    res.sendFile('index.html', {
+        root: '/dist/issue-tracker'
+    });
+});
