@@ -7,8 +7,6 @@ import path from 'path'
 import Issue from './models/Issue';
 import User from './models/User';
 
-import config from './config';
-
 const app = express();
 const router = express.Router();
 
