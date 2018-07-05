@@ -22,6 +22,8 @@ mongoose.connect(dbURI);
 const connection = mongoose.connection;
 connection.once('open', () => {
     console.log('MongoDB database connection established successfully!');
+}, err => {
+    console.log('am chocha error', err)
 });
 
 // app.engine('html', require('ejs').renderFile);
