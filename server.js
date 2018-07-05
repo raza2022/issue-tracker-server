@@ -102,8 +102,9 @@ router.route('/issues/:id').delete((req, res) => {
     });
 });
 
+let port = process.env.port || 4000
 app.use('/', router);
-app.listen(4000, () => console.log(`Express server running on port 4000`));
+app.listen(port, () => console.log(`Express server running on port 4000`));
 
 
 // router.post('/register', function(req, res) {
