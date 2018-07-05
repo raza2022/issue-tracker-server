@@ -4,6 +4,7 @@
   "description": "issue-tracker-server",
   "main": "index.js",
   "scripts": {
+    "start": "babel-watch server.js",
     "dev": "babel-watch server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
