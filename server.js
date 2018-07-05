@@ -104,7 +104,7 @@ router.route('/issues/:id').delete((req, res) => {
     });
 });
 
-let port = process.env.port || 4000
+let port = process.env.PORT || 4000;
 app.use('/', router);
 app.listen(port, () => console.log(`Express server running on port 4000`));
 
