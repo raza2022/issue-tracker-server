@@ -5,6 +5,9 @@ import mongoose from 'mongoose';
 import path from 'path'
 
 import Issue from './models/Issue';
+import User from './models/User';
+
+// var config = require('./config');
 
 const app = express();
 const router = express.Router();
@@ -23,7 +26,23 @@ connection.once('open', () => {
 
 // app.engine('html', require('ejs').renderFile);
 // app.set('view engine', 'html');
+
 app.use(express.static(path.join(__dirname, '/dist/issue-tracker')));
+router.get('/', (req, res) => {
+    res.sendFile('index.html', {
+        root: '/dist/issue-tracker'
+    });
+});
+
+
+router.post('/user').get((req, res) => {
+    User.create(req.body, (err, res) => {
+        if(err){
+            console.log(err)
+        }
+        res.status(200).json({'issue': 'Added successfully'});
+    })
+});
 
 router.route('/issues').get((req, res) => {
     Issue.find((err, issues) => {
@@ -85,8 +104,48 @@ router.route('/issues/:id').delete((req, res) => {
 
 app.use('/', router);
 app.listen(4000, () => console.log(`Express server running on port 4000`));
-router.get('/', (req, res) => {
-    res.sendFile('index.html', {
-        root: '/dist/issue-tracker'
+
+
+router.post('/register', function(req, res) {
+
+    var hashedPassword = bcrypt.hashSync(req.body.password, 8);
+
+    User.create({
+            name : req.body.name,
+            email : req.body.email,
+            password : hashedPassword
+        },
+        function (err, user) {
+            if (err) return res.status(500).send("There was a problem registering the user.")
+            // create a token
+            var token = jwt.sign({ id: user._id }, config.secret, {
+                expiresIn: 86400 // expires in 24 hours
+            });
+            res.status(200).send({ auth: true, token: token });
+        });
+});
+
+router.get('/me', function(req, res) {
+    var token = req.headers['x-access-token'];
+    if (!token) return res.status(401).send({ auth: false, message: 'No token provided.' });
+
+    jwt.verify(token, config.secret, function(err, decoded) {
+        if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+
+        res.status(200).send(decoded);
     });
+});
+
+// GET /logout
+router.get('/logout', function(req, res, next) {
+    if (req.session) {
+        // delete session object
+        req.session.destroy(function(err) {
+            if(err) {
+                return next(err);
+            } else {
+                return res.redirect('/');
+            }
+        });
+    }
 });
